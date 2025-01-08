@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng dụng học từ vựng</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        #hint {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        #message {
+            color: red;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ứng dụng học từ vựng</h1>
+    <button onclick="startGame()">Bắt đầu</button>
+    <div id="game" style="display:none;">
+        <p id="hint"><b>Gợi ý:</b> </p>
+        <input type="text" id="answer" placeholder="Nhập từ vựng" onkeypress="checkEnter(event)" autocomplete="off">
+        <button onclick="checkAnswer()">Kiểm tra</button>
+        <button onclick="showHint()">Hiện Gợi Ý</button>
+        <button onclick="showAnswer()">Hiện Đáp Án</button>
+        <p id="message"></p>
+    </div>
+    
+    <script>
+        const baseWords  = [
+            { hint: "a person or a company who acts for or represents other people or organizations in the buying and selling", word: "a broker", hintTranslation: "một người hoặc một công ty đại diện cho người khác trong việc mua và bán", wordTranslation: "người môi giới" },
+            { hint: "is the state of being legally responsible for something", word: "liability", hintTranslation: "trạng thái có trách nhiệm pháp lý đối với điều gì đó", wordTranslation: "trách nhiệm" },
+            { hint: "insurance bought by an insurance company to protect itself against large demands from its customers.", word: "reinsurance", hintTranslation: "bảo hiểm mà công ty bảo hiểm mua để bảo vệ mình khỏi yêu cầu lớn từ khách hàng", wordTranslation: "bảo hiểm tái" },
+            { hint: "to sign and accept liability", word: "underwrite", hintTranslation: "ký và chấp nhận trách nhiệm", wordTranslation: "bảo lãnh" },
+            { hint: "The amount of money to be paid for an insurance contract", word: "premium", hintTranslation: "số tiền phải trả cho hợp đồng bảo hiểm", wordTranslation: "phí bảo hiểm" },
+            { hint: "the person / business in whose name the insurance contract is held", word: "policyholder", hintTranslation: "người / doanh nghiệp đứng tên hợp đồng bảo hiểm", wordTranslation: "người giữ hợp đồng bảo hiểm" },
+            { hint: "a demand for money under the conditions of an insurance policy", word: "claim", hintTranslation: "yêu cầu tiền theo điều kiện của hợp đồng bảo hiểm", wordTranslation: "yêu cầu bảo hiểm" },
+            { hint: "the money awarded to a victim of loss / damage by an insurance company", word: "compensation", hintTranslation: "số tiền được trao cho nạn nhân của thiệt hại / mất mát bởi công ty bảo hiểm", wordTranslation: "bồi thường" },
+            { hint: "a sum of money paid regularly to a person who has retired.", word: "pension", hintTranslation: "một khoản tiền được trả định kỳ cho người đã nghỉ hưu", wordTranslation: "lương hưu" },
+            { hint: "to try to reach an agreement by formal discussion", word: "negotiate", hintTranslation: "cố gắng đạt được thỏa thuận qua cuộc thảo luận chính thức", wordTranslation: "đàm phán" },
+            { hint: "to succeed in doing or completing something", word: "accomplish", hintTranslation: "thành công trong việc làm hoặc hoàn thành điều gì đó", wordTranslation: "hoàn thành" },
+            { hint: "what is left after something has been destroyed by burning", word: "ash", hintTranslation: "cái còn lại sau khi một thứ gì đó bị phá hủy bởi lửa", wordTranslation: "tro" },
+            { hint: "that must be done because of a law or a rule", word: "compulsory", hintTranslation: "phải làm theo vì luật lệ hoặc quy định", wordTranslation: "bắt buộc" },
+            { hint: "a thick black sticky substance used especially for making the surface of roads that allows water to drain away", word: "draining asphalt", hintTranslation: "chất lỏng đen đặc và dính dùng đặc biệt để làm mặt đường cho phép nước thoát đi", wordTranslation: "nhựa đường thoát nước" },
+            { hint: "the way in which the parts of something such as the page of a book, a website, a garden or a building are arranged", word: "layout", hintTranslation: "cách mà các phần của một thứ gì đó như trang sách, trang web, khu vườn hoặc một tòa nhà được sắp xếp", wordTranslation: "bố cục" },
+            { hint: "to help someone or something out of a dangerous, harmful, or unpleasant situation", word: "rescue", hintTranslation: "giúp ai đó hoặc một thứ gì đó ra khỏi tình huống nguy hiểm, có hại hoặc khó chịu", wordTranslation: "cứu hộ" },
+            { hint: "a person who travels by sea, a sailor, or a member of a ship’s crew whose job is helping to sail a ship", word: "seafarer", hintTranslation: "người đi biển, thủy thủ, hoặc thành viên trong thủy thủ đoàn của một con tàu có nhiệm vụ giúp lái tàu", wordTranslation: "người đi biển" },
+            { hint: "a raised part across the road to make drivers slow down", word: "speed bump", hintTranslation: "một đoạn đường nhô lên qua con đường để làm cho tài xế giảm tốc độ", wordTranslation: "gờ giảm tốc" },
+            { hint: "to slide a short distance by accident so that you fall or nearly fall", word: "slip", hintTranslation: "trượt một đoạn ngắn vô tình khiến bạn ngã hoặc suýt ngã", wordTranslation: "trượt chân" },
+            { hint: "to lose speed while flying and so go out of control", word: "stall", hintTranslation: "mất tốc độ khi bay và mất kiểm soát", wordTranslation: "mất lực" },
+            { hint: "to catch your foot on something and fall or almost fall", word: "srip", hintTranslation: "vấp chân vào cái gì đó và ngã hoặc suýt ngã", wordTranslation: "vấp ngã" },
+            { hint: "something very good and difficult that you have succeeded in doing", word: "achievement", hintTranslation: "một điều gì đó rất tốt và khó khăn mà bạn đã thành công", wordTranslation: "thành tựu" },
+            { hint: "a formal (often written) request for something, such as a job, permission to do something or a place at a college or university", word: "application", hintTranslation: "yêu cầu chính thức (thường bằng văn bản) về một cái gì đó, như công việc, sự cho phép làm gì đó hoặc một vị trí tại trường đại học", wordTranslation: "đơn xin" },
+            { hint: "clothes, especially of a particular or formal type", word: "attire", hintTranslation: "quần áo, đặc biệt là loại quần áo đặc biệt hoặc chính thức", wordTranslation: "trang phục" },
+            { hint: "to involve something that cannot be avoided", word: "entail", hintTranslation: "bao gồm điều gì đó không thể tránh khỏi", wordTranslation: "bao hàm" },
+            { hint: "to something a way of getting or achieving something", word: "gateway", hintTranslation: "một cách để đạt được điều gì đó", wordTranslation: "cổng vào" },
+            { hint: "very good or very moral standards", word: "high standard", hintTranslation: "tiêu chuẩn rất cao hoặc đạo đức rất tốt", wordTranslation: "tiêu chuẩn cao" },
+            { hint: "wanting to do something, especially something that involves hard work and effort", word: "motivated", hintTranslation: "mong muốn làm điều gì đó, đặc biệt là điều đụng đến công sức và nỗ lực", wordTranslation: "được thúc đẩy" },
+            { hint: "the activity of searching for gold, oil, or other valuable substances on or under the surface of the Earth", word: "prospecting", hintTranslation: "hoạt động tìm kiếm vàng, dầu hoặc các chất giá trị khác trên hoặc dưới bề mặt trái đất", wordTranslation: "khảo sát" },
+            { hint: "a letter written by somebody who knows you, giving information about your character and abilities, especially to a new employer", word: "reference", hintTranslation: "một lá thư được viết bởi ai đó biết bạn, cung cấp thông tin về tính cách và khả năng của bạn, đặc biệt là cho một nhà tuyển dụng mới", wordTranslation: "thư giới thiệu" },
+            { hint: "to be much better than other similar things or people", word: "stand out", hintTranslation: "nổi bật hơn so với những thứ hoặc người tương tự", wordTranslation: "nổi bật" }
+        ];
+
+        const words = [];
+        for (let i = 0; i < 1; i++) {
+            words.push(...baseWords);
+        }
+        let currentWordIndex = 0;
+        
+        function startGame() {
+            currentWordIndex = Math.floor(Math.random() * words.length);
+            document.getElementById("game").style.display = "block";
+            document.getElementById("hint").innerHTML = "<b>Gợi ý:</b> " + words[currentWordIndex].hint;
+            document.getElementById("message").textContent = "";
+            document.getElementById("answer").value = "";
+            document.getElementById("answer").focus();
+        }
+
+        function checkAnswer() {
+            let answer = document.getElementById("answer").value.trim().toLowerCase();
+            if (answer === words[currentWordIndex].word.toLowerCase()) {
+                document.getElementById("message").innerHTML = `<span class="correct">Chính xác! (${words[currentWordIndex].word} - ${words[currentWordIndex].wordTranslation})</span>`;
+                words.splice(currentWordIndex, 1);
+                if (words.length === 0) {
+                    alert("Chúc mừng! Bạn đã hoàn thành tất cả từ vựng.");
+                    document.getElementById("game").style.display = "none";
+                } else {
+                    setTimeout(startGame, 1000);
+                }
+            } else {
+                document.getElementById("message").textContent = "Sai! Hãy thử lại.";
+            }
+        }
+
+        function showHint() {
+            document.getElementById("message").innerHTML = `<b>Gợi ý:</b> ${words[currentWordIndex].hintTranslation}`;
+        }
+
+        function showAnswer() {
+            document.getElementById("message").innerHTML = `<b>Đáp án:</b> ${words[currentWordIndex].word} - ${words[currentWordIndex].wordTranslation}`;
+        }
+
+        function checkEnter(event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+        }
+    </script>
+</body>
+</html>
