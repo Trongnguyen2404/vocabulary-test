@@ -162,11 +162,11 @@
         }
 
         function showHint() {
-            alert("Gợi ý: " + words[currentWordIndex].hintTranslation);
+            document.getElementById("message").innerHTML = `<b>Gợi ý:</b> ${words[currentWordIndex].hintTranslation}`;
         }
 
         function showAnswer() {
-            alert("Đáp án: " + words[currentWordIndex].word + " - " + words[currentWordIndex].wordTranslation);
+            document.getElementById("message").innerHTML = `<b>Đáp án:</b> ${words[currentWordIndex].word} - ${words[currentWordIndex].wordTranslation}`;
         }
     </script>
 </body>
