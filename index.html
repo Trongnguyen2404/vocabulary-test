@@ -96,7 +96,7 @@
     </div>
     
     <script>
-        const baseWords  = [
+        const words   = [
             { hint: "a person or a company who acts for or represents other people or organizations in the buying and selling", word: "a broker", hintTranslation: "một người hoặc một công ty đại diện cho người khác trong việc mua và bán", wordTranslation: "người môi giới" },
             { hint: "is the state of being legally responsible for something", word: "liability", hintTranslation: "trạng thái có trách nhiệm pháp lý đối với điều gì đó", wordTranslation: "trách nhiệm" },
             { hint: "insurance bought by an insurance company to protect itself against large demands from its customers.", word: "reinsurance", hintTranslation: "bảo hiểm mà công ty bảo hiểm mua để bảo vệ mình khỏi yêu cầu lớn từ khách hàng", wordTranslation: "bảo hiểm tái" },
@@ -129,11 +129,6 @@
             { hint: "a letter written by somebody who knows you, giving information about your character and abilities, especially to a new employer", word: "reference", hintTranslation: "một lá thư được viết bởi ai đó biết bạn, cung cấp thông tin về tính cách và khả năng của bạn, đặc biệt là cho một nhà tuyển dụng mới", wordTranslation: "thư giới thiệu" },
             { hint: "to be much better than other similar things or people", word: "stand out", hintTranslation: "nổi bật hơn so với những thứ hoặc người tương tự", wordTranslation: "nổi bật" }
         ];
-
-        const words = [];
-        for (let i = 0; i < 1; i++) {
-            words.push(...baseWords);
-        }
         let currentWordIndex = 0;
         
         function startGame() {
